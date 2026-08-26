@@ -1,1 +1,164 @@
+# NMAP NETWORK SCAN RESULTS
+
+## Target
+
+**192.168.1.9 — Metasploitable Test Machine**
+
+## Basic Scan
+
+**Command:**
+
+```bash
+nmap 192.168.1.9
+```
+
+**Actual Result:**
+
+```text
+Nmap scan report for 192.168.1.9
+Host is up.
+
+Not shown: 977 closed tcp ports (reset)
+
+PORT     STATE SERVICE
+21/tcp   open  ftp
+22/tcp   open  ssh
+23/tcp   open  telnet
+25/tcp   open  smtp
+53/tcp   open  domain
+80/tcp   open  http
+111/tcp  open  rpcbind
+139/tcp  open  netbios-ssn
+445/tcp  open  microsoft-ds
+512/tcp  open  exec
+513/tcp  open  login
+514/tcp  open  shell
+1099/tcp open  rmiregistry
+1524/tcp open  ingreslock
+2049/tcp open  nfs
+2121/tcp open  ccproxy-ftp
+3306/tcp open  mysql
+5432/tcp open  postgresql
+5900/tcp open  vnc
+6000/tcp open  X11
+6667/tcp open  irc
+8009/tcp open  ajp13
+8180/tcp open  unknown
+```
+
+## Service Version Scan
+
+**Command:**
+
+```bash
+nmap -sV 192.168.1.9
+```
+
+**Actual Result:**
+
+```text
+21/tcp   open  ftp          vsftpd 2.3.4
+22/tcp   open  ssh          OpenSSH 4.7p1 Debian 8ubuntu1
+23/tcp   open  telnet       Linux telnetd
+25/tcp   open  smtp         Postfix smtpd
+53/tcp   open  domain       ISC BIND 9.4.2
+80/tcp   open  http         Apache httpd 2.2.8
+111/tcp  open  rpcbind      2 (RPC #100000)
+139/tcp  open  netbios-ssn  Samba smbd 3.X - 4.X
+445/tcp  open  netbios-ssn  Samba smbd 3.X - 4.X
+512/tcp  open  exec         netkit-rsh rexecd
+513/tcp  open  login        OpenBSD or Solaris rlogind
+514/tcp  open  tcpwrapped
+1099/tcp open  java-rmi     GNU Classpath grmiregistry
+1524/tcp open  bindshell    Metasploitable root shell
+2049/tcp open  nfs          2-4 (RPC #100003)
+2121/tcp open  ftp          ProFTPD 1.3.1
+3306/tcp open  mysql        MySQL 5.0.51a-3ubuntu5
+5432/tcp open  postgresql   PostgreSQL DB 8.3.x
+5900/tcp open  vnc          VNC protocol 3.3
+6000/tcp open  X11          (access denied)
+6667/tcp open  irc          UnrealIRCd
+8009/tcp open  ajp13        Apache Jserv Protocol 1.3
+8180/tcp open  http         Apache Tomcat/Coyote JSP engine 1.1
+```
+
+## OS Detection
+
+**Command:**
+
+```bash
+sudo nmap -O 192.168.1.9
+```
+
+**Actual Result:**
+
+```text
+Device type: general purpose
+Running: Linux 2.6.X
+OS details: Linux 2.6.9 - 2.6.33
+Network Distance: 1 hop
+```
+
+The target was identified as a **Linux-based Metasploitable system**.
+
+# OPEN PORT ANALYSIS
+
+| Port | Service     | Purpose                      | Security Risk                                     |
+| ---: | ----------- | ---------------------------- | ------------------------------------------------- |
+|   21 | FTP         | File transfer                | Unencrypted communication; old version            |
+|   22 | SSH         | Secure remote login          | Old SSH version; should be updated                |
+|   23 | Telnet      | Remote login                 | Unencrypted and insecure                          |
+|   25 | SMTP        | Email transfer               | Can be abused if improperly configured            |
+|   53 | DNS         | Domain name resolution       | Old BIND version                                  |
+|   80 | HTTP        | Web server                   | Unencrypted HTTP and old Apache                   |
+|  111 | RPCbind     | RPC service discovery        | Can expose RPC services                           |
+|  139 | NetBIOS     | Windows/Samba file sharing   | Information and access exposure                   |
+|  445 | SMB         | File/printer sharing         | Increased attack surface                          |
+|  512 | rexec       | Remote command execution     | Legacy and insecure                               |
+|  513 | rlogin      | Remote login                 | Legacy and insecure                               |
+|  514 | shell       | Remote shell                 | Legacy remote-access service                      |
+| 1099 | Java RMI    | Java remote services         | Remote service exposure                           |
+| 1524 | Bindshell   | Root shell                   | **Extremely high risk**; intentionally vulnerable |
+| 2049 | NFS         | Network file sharing         | Misconfiguration may expose files                 |
+| 2121 | FTP         | File transfer                | Additional FTP service; old software              |
+| 3306 | MySQL       | Database service             | Database exposed to network                       |
+| 5432 | PostgreSQL  | Database service             | Database exposed; old version                     |
+| 5900 | VNC         | Remote desktop               | Unauthorized access risk                          |
+| 6000 | X11         | Graphical display service    | Network exposure can be risky                     |
+| 6667 | IRC         | Internet Relay Chat          | Unnecessary service exposure                      |
+| 8009 | AJP13       | Tomcat application connector | Application-server exposure                       |
+| 8180 | HTTP/Tomcat | Web application server       | Old application-server service                    |
+
+## Important Findings
+
+The scan identified **23 open TCP ports** on `192.168.1.9`.
+
+The highest-risk services observed were:
+
+* **Port 23 – Telnet:** Uses an insecure, unencrypted protocol.
+* **Ports 512–514 – rexec/rlogin/shell:** Legacy remote-access services.
+* **Port 1524 – Bindshell:** Provides an intentionally vulnerable root shell in Metasploitable.
+* **Port 3306 – MySQL:** Database service exposed over the network.
+* **Port 5432 – PostgreSQL:** Database service exposed over the network.
+* **Port 5900 – VNC:** Remote graphical access service.
+* **Ports 139/445 – SMB:** File-sharing services increase the attack surface.
+* **Ports 80/8180 – HTTP/Tomcat:** Web services using old software versions.
+
+## Security Analysis
+
+The target machine has a large number of exposed services. Several services use old software versions or insecure legacy protocols.
+
+The most serious issue is the **Metasploitable root shell on port 1524**, which is intentionally present for cybersecurity training. In a real production system, such a service would represent a critical security risk.
+
+The exposed FTP, Telnet, database, SMB, VNC and legacy remote-access services also increase the system's attack surface.
+
+For a real system, unnecessary services should be disabled, software should be updated, network access should be restricted, and encrypted protocols should be preferred.
+
+## Conclusion
+
+The Nmap scan successfully identified **23 open TCP ports and their associated services** on the Metasploitable test machine at `192.168.1.9`. Service-version detection identified several outdated services, while OS detection identified the target as a Linux-based system.
+
+The results demonstrate how network scanning can be used to identify exposed services and potential security risks. Since this was an intentionally vulnerable Metasploitable laboratory machine, the findings are suitable for cybersecurity learning and testing.
+
+Unnecessary services should be disabled, exposed services should be properly secured, and systems should be regularly updated and monitored.
 

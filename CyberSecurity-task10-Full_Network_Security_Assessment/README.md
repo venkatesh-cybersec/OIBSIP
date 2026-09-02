@@ -304,7 +304,7 @@ The Metasploitable environment provides multiple intentionally vulnerable servic
 ## Internship
 
 **Organization:** Oasis Infobyte  
-**Track:** Cyber Security  
+**Track:** Security Analyst 
 **Internship:** Security Analysis Internship  
 **Task:** Full Network Security Assessment Report
 
